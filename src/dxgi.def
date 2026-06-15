@@ -1,0 +1,23 @@
+; Export table for the GlyphSwap dxgi.dll proxy.
+; Names AND ordinals mirror the real system dxgi.dll so that both name-based and
+; ordinal-based imports (d3d11.dll imports some DXGID3D10* by ordinal) resolve.
+EXPORTS
+ApplyCompatResolutionQuirking    @1
+CompatString                     @2
+CompatValue                      @3
+CreateDXGIFactory                @4
+CreateDXGIFactory1               @5
+CreateDXGIFactory2               @6
+DXGID3D10CreateDevice            @7
+DXGID3D10CreateLayeredDevice     @8
+DXGID3D10GetLayeredDeviceSize    @9
+DXGID3D10RegisterLayers          @10
+DXGIDeclareAdapterRemovalSupport @11
+DXGIDumpJournal                  @12
+DXGIGetDebugInterface1           @13
+DXGIReportAdapterConfiguration   @14
+PIXBeginCapture                  @15
+PIXEndCapture                    @16
+PIXGetCaptureState               @17
+SetAppCompatStringPointer        @18
+UpdateHMDEmulationStatus         @19

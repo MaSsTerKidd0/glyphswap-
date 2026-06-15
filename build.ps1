@@ -87,5 +87,22 @@ $injArgs = @(
 & $gpp @injArgs
 if ($LASTEXITCODE -ne 0) { throw "Injector link failed." }
 
+# --- compile + link the dxgi PROXY (drop-in wrapper, no injector needed) ----
+# Same mod code, but DllMain comes from proxy_dxgi.cpp and exports mirror the
+# real dxgi.dll (src\dxgi.def). No -ldxgi: we forward dxgi, we don't consume it.
+Write-Host "  CXX dllmain.cpp + proxy_dxgi.cpp -> dxgi.dll"
+$proxyArgs = @(
+    "-shared", "-O2", "-std=c++17", "-DNDEBUG", "-DGLYPHSWAP_AS_PROXY",
+    "-DUNICODE", "-D_UNICODE", "-DWIN32_LEAN_AND_MEAN", "-DNOMINMAX",
+    "-I", "$root\src", "-I", "$mh\include",
+    "$root\src\dllmain.cpp", "$root\src\proxy_dxgi.cpp", "$root\src\dxgi.def"
+) + $mhObjs + @(
+    "-o", "$dist\dxgi.dll",
+    "-static", "-static-libgcc", "-static-libstdc++",
+    "-ld3d11", "-lwindowscodecs", "-lole32", "-loleaut32", "-luuid"
+)
+& $gpp @proxyArgs
+if ($LASTEXITCODE -ne 0) { throw "dxgi proxy link failed." }
+
 Write-Host "`nBuild OK ->" -ForegroundColor Green
 Get-ChildItem $dist | Select-Object Length, Name

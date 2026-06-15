@@ -38,7 +38,9 @@ See [`src/dllmain.cpp`](src/dllmain.cpp) for the heavily-commented implementatio
 ```
 glyphswap/
 ├─ src/
-│  ├─ dllmain.cpp        # config, logging, the 4 DX11 hooks, bootstrap, DllMain
+│  ├─ dllmain.cpp        # config, logging, the 4 DX11 hooks, bootstrap
+│  ├─ proxy_dxgi.cpp     # drop-in dxgi.dll wrapper (no-injector loader)
+│  ├─ dxgi.def           # proxy export table (mirrors real dxgi ordinals)
 │  ├─ Crc32.h            # table-based CRC32 (texture fingerprinting)
 │  └─ TextureLoader.h    # WIC: PNG/JPG/BMP/TIFF -> ID3D11ShaderResourceView
 ├─ injector/
@@ -59,7 +61,8 @@ glyphswap/
 └─ README.md            # this file
 ```
 
-After a build, artifacts land in **`dist/`**: `GlyphSwap.dll`, `Injector.exe`.
+After a build, artifacts land in **`dist/`**: `dxgi.dll` (drop-in proxy loader),
+`GlyphSwap.dll` (injected loader), and `Injector.exe`.
 
 ---
 
@@ -82,17 +85,19 @@ Full details, including Visual Studio, are in **[INSTALL.md](INSTALL.md)**.
 
 ### 2. Install into the game folder
 
-Copy next to `OPWS.exe` (e.g. `...\Game\Binaries\Win64\`):
+Copy next to `OPWS.exe` (e.g. `...\Game\Binaries\Win64\`). **Recommended: the
+`dxgi.dll` drop-in** — no injector, no antivirus warning, just launch the game:
 
 ```
 OPWS.exe
-GlyphSwap.dll
-Injector.exe
+dxgi.dll               # ← the mod (loads automatically); delete to uninstall
 GlyphSwap\
   config.ini
-  ps4_buttons.png        # your artwork (added after discovery)
+  ps4_buttons.png
   debug_magenta.png
 ```
+
+(Alternatively use `GlyphSwap.dll` + `Injector.exe` — see [INSTALL.md §7](INSTALL.md).)
 
 ### 3. Find the texture, then swap it
 
@@ -118,10 +123,12 @@ The full discovery walkthrough is in **[INSTALL.md](INSTALL.md#5-finding-the-xbo
 
 Built and verified with **MinGW-w64 GCC 15.2 (x64, UCRT)** on Windows 10 22H2:
 
-- ✅ `GlyphSwap.dll` — 64-bit PE, imports `d3d11.dll`, MinHook linked statically.
-- ✅ `Injector.exe` — 64-bit console injector.
-- ✅ Load test: DLL injected into a host process → bootstrap ran → **all four
+- ✅ `GlyphSwap.dll` / `dxgi.dll` / `Injector.exe` — all 64-bit PEs; MinHook static.
+- ✅ Load test: DLL loaded into a host process → bootstrap ran → **all four
   DX11 hooks installed OK** (dummy device falls back to WARP when no GPU).
+- ✅ `dxgi.dll` proxy: exports all 19 dxgi functions at matching ordinals; a
+  forwarded `CreateDXGIFactory1` returned a valid factory (`hr=0`) and the mod
+  booted — no injector needed.
 - ✅ WIC path: PNG decoded → `R8G8B8A8` texture + SRV created successfully.
 
 The only piece that requires the actual game is matching OPWS's specific Xbox

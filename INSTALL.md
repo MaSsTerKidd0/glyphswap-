@@ -116,14 +116,18 @@ Place files **next to that exe**:
 ```
 ...\Binaries\Win64\
 ├─ OPWS.exe
-├─ GlyphSwap.dll        ← from dist\
-├─ Injector.exe            ← from dist\
+├─ dxgi.dll             ← from dist\  (Method A: drop-in, no injector — recommended)
+├─ GlyphSwap.dll        ← from dist\  (Method B: used by the injector)
+├─ Injector.exe         ← from dist\  (Method B only)
 └─ GlyphSwap\
    ├─ config.ini
    ├─ debug_magenta.png    ← for discovery (included)
-   ├─ ps4_buttons.png      ← your art (add after discovery)
-   └─ glyphswap_log.txt       ← created at runtime
+   ├─ ps4_buttons.png      ← your art (built by tools\build_atlas.ps1)
+   └─ glyphswap_log.txt    ← created at runtime
 ```
+
+> You only need **one** loader. For Method A just `dxgi.dll`; for Method B
+> `GlyphSwap.dll` + `Injector.exe`. See §7.
 
 > If a small launcher `OPWS.exe` spawns a separate *Shipping* exe, inject into
 > whichever process owns the game window and the GPU usage. Pass its name to the
@@ -222,9 +226,32 @@ compositor and point one `0xHASH = pack_file.png` rule at each pack PNG directly
 
 ---
 
-## 7. Running & injecting
+## 7. Running
 
-**Built-in injector** — it waits up to ~2 minutes for the process, so order
+There are two ways to load the mod. **Method A is recommended** — no injector,
+no antivirus warning.
+
+### Method A — drop-in `dxgi.dll` proxy (recommended)
+
+Copy **`dist\dxgi.dll`** next to `OPWS.exe` (alongside the `GlyphSwap\` folder)
+and just launch the game normally. The game loads our `dxgi.dll` from its own
+folder, which transparently forwards every DXGI call to the real system
+`dxgi.dll` while booting the mod. Because there's no `CreateRemoteThread`,
+antivirus has nothing to flag.
+
+```
+...\Binaries\Win64\
+├─ OPWS.exe
+├─ dxgi.dll            ← from dist\  (this IS the mod)
+└─ GlyphSwap\ ...
+```
+
+To uninstall, just delete `dxgi.dll`. (If the game ever fails to start, it means
+that title resolves dxgi differently — fall back to Method B.)
+
+### Method B — injector
+
+The standalone injector waits up to ~2 minutes for the process, so order
 doesn't matter:
 
 ```powershell
@@ -232,19 +259,14 @@ doesn't matter:
 .\Injector.exe OPWS.exe GlyphSwap.dll
 ```
 
-Optional `run.bat` next to the game exe:
+> **Antivirus note:** Defender flags *any* DLL injector (the
+> `CreateRemoteThread`+`LoadLibrary` pattern) as a generic HackTool/PUA — a false
+> positive on your own build. Either use Method A, or add a Windows Security
+> **folder exclusion** for the game directory and restore the file from
+> Protection history. (Xenos and other external injectors work too, standard
+> `LoadLibrary` method.)
 
-```bat
-@echo off
-start "" Injector.exe OPWS.exe GlyphSwap.dll
-start "" steam://rungameid/PUT_APPID_HERE
-```
-
-**Prefer Xenos?** Add `GlyphSwap.dll`, target `OPWS.exe`, use the standard
-`LoadLibrary` method (manual mapping not required), and inject after the game
-window appears.
-
-Confirm success in `GlyphSwap\glyphswap_log.txt`:
+Confirm success either way in `GlyphSwap\glyphswap_log.txt`:
 
 ```
 === GlyphSwap starting ===
@@ -261,8 +283,10 @@ Loaded replacement '...\GlyphSwap\ps4_buttons.png'
 
 | Symptom | Cause / fix |
 |---|---|
+| Antivirus blocks `Injector.exe` ("contains a virus / PUA") | False positive on the injector pattern. Use **Method A** (`dxgi.dll`), or add a folder exclusion (see §7). |
 | `LoadLibrary returned 0` | Wrong arch (must be x64), or injected before D3D11 init — inject at the menu. |
-| No `glyphswap_log.txt` at all | DLL never loaded; check the injector found the right process and DLL path. |
+| Method A: game won't start, or no `glyphswap_log.txt` | That title resolves dxgi differently — delete `dxgi.dll` and use Method B (injector). |
+| No `glyphswap_log.txt` at all (Method B) | DLL never loaded; check the injector found the right process and DLL path. |
 | Log exists, no `[TEX]` lines | `DumpTextures` is 0, or the atlas is created without initial pixel data (streamed) — try the magenta dimension rule instead of a hash. |
 | `[MATCH]` appears but nothing changes on screen | Glyphs may come from a different stage/material; verify with the magenta tile first. |
 | `FAILED to load '…png'` | Path/typo, or file isn't a PNG/JPG/BMP/TIFF (DDS isn't supported by WIC). |

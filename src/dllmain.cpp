@@ -459,6 +459,18 @@ static DWORD WINAPI Bootstrap(LPVOID)
     return 0;
 }
 
+// Start the mod exactly once. Called either by the injected-mode DllMain below,
+// or by the dxgi-proxy DllMain (proxy_dxgi.cpp) after it resolves the real
+// dxgi exports. Spawns a worker so we never do real work under the loader lock.
+extern "C" void GlyphSwap_Start()
+{
+    static LONG started = 0;
+    if (InterlockedExchange(&started, 1) == 0)
+        CreateThread(nullptr, 0, Bootstrap, nullptr, 0, nullptr);
+}
+
+// In proxy builds (-DGLYPHSWAP_AS_PROXY) the DllMain lives in proxy_dxgi.cpp.
+#ifndef GLYPHSWAP_AS_PROXY
 // extern "C" + WINAPI keeps the symbol name/linkage the CRT startup expects on
 // both MSVC and MinGW-w64.
 extern "C" BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
@@ -466,8 +478,8 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
     if (reason == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(hinst);
-        // Do real work off the loader lock.
-        CreateThread(nullptr, 0, Bootstrap, nullptr, 0, nullptr);
+        GlyphSwap_Start();
     }
     return TRUE;
 }
+#endif
