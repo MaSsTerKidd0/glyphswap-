@@ -187,10 +187,38 @@ consequence: your atlas must mirror the original.
   transparent (alpha) so only the glyphs are opaque.
 - If prompts span several atlases, add one `0xHASH = file.png` rule per atlas.
 
-A starter glyph sheet is included at **`PS4Mod/ps4_buttons_template.png`**
-(1024×512, transparent, the four face buttons + L1/R1/L2/R2). It is *reference
-art*, not drop-in: re-lay the glyphs onto the cell grid the dump step reveals,
-then save as your `ps4_buttons.png`.
+Starter glyph sheets are included in `PS4Mod/` (transparent, optically centered):
+`ps4_buttons_template.png` (1024×1024 — face buttons in rings, L1/R1/L2/R2,
+L3/R3, D-pad, Touchpad, Options, Share, PS) and `ps4_buttons_filled.png`
+(solid face buttons). These are procedural *reference art* — fine as a
+placeholder, but for a designed look use a CC0 pack (next section).
+
+### Using a CC0 prompt pack (recommended for best quality)
+
+The mod swaps **any** PNG, so the highest-quality route is a free,
+professionally-designed controller-prompt pack rather than hand-drawn glyphs:
+
+- **Kenney — “Input Prompts”** (`kenney.nl/assets/input-prompts`, CC0)
+- **Xelu — “FREE Controller & Keyboard Prompts”** (`thoseawesomeguys.com/prompts`,
+  CC0) — the multi-style set most button mods use.
+
+A pack ships **one PNG per button**, but the game samples **one atlas** texture,
+so the included compositor stitches them together:
+
+```powershell
+# 1. Put the pack's PlayStation PNGs in tools\glyphs\
+# 2. After discovery, edit tools\atlas_layout.ini:
+#      [atlas] width/height  = the original atlas size from the [TEX] log line
+#      each glyph's x,y,w,h   = the cell that glyph must occupy
+# 3. Build the atlas:
+.\tools\build_atlas.ps1
+#    -> writes PS4Mod\ps4_buttons.png (clean bicubic scaling, transparent bg)
+# 4. Point config.ini at it:  0xHASH = ps4_buttons.png
+```
+
+See [tools/glyphs/README.md](tools/glyphs/README.md) for pack links and naming.
+If the game uses **separate** textures per glyph (not one atlas), skip the
+compositor and point one `0xHASH = pack_file.png` rule at each pack PNG directly.
 
 ---
 

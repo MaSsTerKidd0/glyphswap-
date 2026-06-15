@@ -43,6 +43,10 @@ PS4DUALSHOCK_Layout/
 │  └─ TextureLoader.h    # WIC: PNG/JPG/BMP/TIFF -> ID3D11ShaderResourceView
 ├─ injector/
 │  └─ main.cpp           # LoadLibrary + CreateRemoteThread console injector
+├─ tools/
+│  ├─ build_atlas.ps1    # stitch individual pack glyphs into one atlas PNG
+│  ├─ atlas_layout.ini   # cell layout for the compositor (edit after discovery)
+│  └─ glyphs/            # drop a CC0 prompt pack's PNGs here
 ├─ third_party/
 │  └─ minhook/           # MinHook (git submodule / clone) — built from source
 ├─ PS4Mod/                    # ← ships next to the game .exe at runtime
