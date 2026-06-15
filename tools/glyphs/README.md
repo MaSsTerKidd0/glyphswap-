@@ -1,8 +1,15 @@
-# Drop your controller-prompt glyphs here
+# Controller-prompt glyphs
 
 Put the **individual** PNG icons from a CC0 controller-prompt pack in this
 folder, then run `..\build_atlas.ps1` to stitch them into a single
 `GlyphSwap\ps4_buttons.png` atlas the mod can swap in.
+
+## Bundled (already here)
+
+The PlayStation glyphs used by `atlas_layout.ini` are from **Kenney's “Input
+Prompts”** pack (`PlayStation Series/Default`, 64×64) — see `KENNEY_LICENSE.txt`
+(**CC0 / public domain**, credit appreciated but not required). To use a
+different style, drop in other pack files and update `..\atlas_layout.ini`.
 
 ## Recommended free (CC0 / public-domain) packs
 
