@@ -1,5 +1,5 @@
-// dllmain.cpp — PS4 button-prompt texture-swap mod for
-// One Piece: World Seeker (Unreal Engine 4 / DirectX 11).
+// dllmain.cpp — GlyphSwap: a controller button-prompt texture swapper for
+// DirectX 11 games (e.g. One Piece: World Seeker on Unreal Engine 4).
 //
 // Build as a 64-bit DLL. Requires MinHook (https://github.com/TsudaKageyu/minhook).
 //
@@ -81,7 +81,7 @@ static PSSetSRV_t        oPSSetSRV         = nullptr;
 // Paths, logging (Unicode-safe via wide stdio so it works under folders like
 // "C:\Users\<non-ascii>\...").
 // ---------------------------------------------------------------------------
-static std::wstring g_modDir;   // <game folder>\PS4Mod
+static std::wstring g_modDir;   // <game folder>\GlyphSwap
 static std::wstring g_logPath;
 
 static std::string Narrow(const std::wstring& w)
@@ -121,12 +121,12 @@ static void InitPaths()
     std::wstring p(exe);
     size_t slash = p.find_last_of(L"\\/");
     std::wstring dir = (slash == std::wstring::npos) ? L"." : p.substr(0, slash);
-    g_modDir = dir + L"\\PS4Mod";
-    g_logPath = g_modDir + L"\\ps4mod_log.txt";
+    g_modDir = dir + L"\\GlyphSwap";
+    g_logPath = g_modDir + L"\\glyphswap_log.txt";
 }
 
 // ---------------------------------------------------------------------------
-// Config (PS4Mod\config.ini).
+// Config (GlyphSwap\config.ini).
 // ---------------------------------------------------------------------------
 struct Config
 {
@@ -385,7 +385,7 @@ static bool InstallHooks()
     wc.cbSize = sizeof(wc);
     wc.lpfnWndProc = DefWindowProcW;
     wc.hInstance = GetModuleHandleW(nullptr);
-    wc.lpszClassName = L"PS4ModDummyWnd";
+    wc.lpszClassName = L"GlyphSwapDummyWnd";
     RegisterClassExW(&wc);
     HWND hwnd = CreateWindowExW(0, wc.lpszClassName, L"", WS_OVERLAPPEDWINDOW,
                                 0, 0, 64, 64, nullptr, nullptr, wc.hInstance, nullptr);
@@ -453,7 +453,7 @@ static bool InstallHooks()
 static DWORD WINAPI Bootstrap(LPVOID)
 {
     InitPaths();
-    Log("=== PS4 Button Mod starting ===");
+    Log("=== GlyphSwap starting ===");
     ParseConfig();                           // must run before hooks fire
     InstallHooks();
     return 0;

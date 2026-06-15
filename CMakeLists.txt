@@ -1,4 +1,4 @@
-# CMakeLists.txt — builds PS4ButtonMod.dll and Injector.exe.
+# CMakeLists.txt — builds GlyphSwap.dll and Injector.exe.
 #
 # Works with either toolchain:
 #   * MSVC      (Visual Studio "Desktop development with C++")
@@ -16,7 +16,7 @@
 #   cmake --build build --config Release
 
 cmake_minimum_required(VERSION 3.16)
-project(PS4ButtonMod LANGUAGES C CXX)
+project(GlyphSwap LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,9 +42,9 @@ target_include_directories(minhook PUBLIC ${MINHOOK_DIR}/include)
 # ---------------------------------------------------------------------------
 # The mod DLL
 # ---------------------------------------------------------------------------
-add_library(PS4ButtonMod SHARED src/dllmain.cpp)
-target_link_libraries(PS4ButtonMod PRIVATE minhook d3d11 dxgi windowscodecs ole32 oleaut32 uuid)
-set_target_properties(PS4ButtonMod PROPERTIES PREFIX "" OUTPUT_NAME "PS4ButtonMod")
+add_library(GlyphSwap SHARED src/dllmain.cpp)
+target_link_libraries(GlyphSwap PRIVATE minhook d3d11 dxgi windowscodecs ole32 oleaut32 uuid)
+set_target_properties(GlyphSwap PROPERTIES PREFIX "" OUTPUT_NAME "GlyphSwap")
 
 # ---------------------------------------------------------------------------
 # The injector
@@ -55,7 +55,7 @@ set_target_properties(Injector PROPERTIES OUTPUT_NAME "Injector")
 # Statically link the GCC/C++ runtimes so the artifacts are self-contained
 # (the game does not need any MinGW redistributable present).
 if(MINGW)
-  target_link_options(PS4ButtonMod PRIVATE -static -static-libgcc -static-libstdc++)
+  target_link_options(GlyphSwap PRIVATE -static -static-libgcc -static-libstdc++)
   target_link_options(Injector     PRIVATE -static -static-libgcc -static-libstdc++)
   # The injector uses wmain(); -municode selects wmainCRTStartup as the entry.
   target_compile_options(Injector PRIVATE -municode)
@@ -64,6 +64,6 @@ endif()
 
 # Statically link the MSVC runtime for the same reason.
 if(MSVC)
-  set_property(TARGET PS4ButtonMod Injector PROPERTY
+  set_property(TARGET GlyphSwap Injector PROPERTY
     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()

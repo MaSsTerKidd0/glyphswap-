@@ -1,7 +1,7 @@
 // Injector — classic LoadLibrary + CreateRemoteThread DLL injector.
 //
 // Usage:  Injector.exe [process.exe] [path\to\mod.dll]
-// Default: OPWS.exe  and  .\PS4ButtonMod.dll
+// Default: OPWS.exe  and  .\GlyphSwap.dll
 //
 // Waits up to ~2 minutes for the target process, so you can start it before
 // OR after launching the game.
@@ -34,7 +34,7 @@ static DWORD FindPid(const wchar_t* exeName)
 int wmain(int argc, wchar_t** argv)
 {
     std::wstring proc = (argc > 1) ? argv[1] : L"OPWS.exe";
-    std::wstring dll  = (argc > 2) ? argv[2] : L"PS4ButtonMod.dll";
+    std::wstring dll  = (argc > 2) ? argv[2] : L"GlyphSwap.dll";
 
     // Resolve the DLL to an absolute path. LoadLibrary in the target's context
     // would otherwise resolve a relative path against the GAME's working dir.

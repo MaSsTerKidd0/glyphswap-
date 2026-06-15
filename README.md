@@ -1,4 +1,4 @@
-# PS4 Button Mod — One Piece: World Seeker
+# GlyphSwap — PlayStation button prompts for DirectX 11 games
 
 A from-scratch C++ DLL that hooks the game's **DirectX 11** rendering pipeline,
 identifies the **Xbox button-prompt texture** in memory, and swaps it for your
@@ -36,7 +36,7 @@ See [`src/dllmain.cpp`](src/dllmain.cpp) for the heavily-commented implementatio
 ## Repository layout
 
 ```
-PS4DUALSHOCK_Layout/
+glyphswap/
 ├─ src/
 │  ├─ dllmain.cpp        # config, logging, the 4 DX11 hooks, bootstrap, DllMain
 │  ├─ Crc32.h            # table-based CRC32 (texture fingerprinting)
@@ -49,7 +49,7 @@ PS4DUALSHOCK_Layout/
 │  └─ glyphs/            # drop a CC0 prompt pack's PNGs here
 ├─ third_party/
 │  └─ minhook/           # MinHook (git submodule / clone) — built from source
-├─ PS4Mod/                    # ← ships next to the game .exe at runtime
+├─ GlyphSwap/                    # ← ships next to the game .exe at runtime
 │  ├─ config.ini              # dump toggle + replacement rules
 │  ├─ debug_magenta.png       # solid-magenta tile for the discovery workflow
 │  └─ ps4_buttons_template.png# starter glyph art (rework to match the atlas)
@@ -59,7 +59,7 @@ PS4DUALSHOCK_Layout/
 └─ README.md            # this file
 ```
 
-After a build, artifacts land in **`dist/`**: `PS4ButtonMod.dll`, `Injector.exe`.
+After a build, artifacts land in **`dist/`**: `GlyphSwap.dll`, `Injector.exe`.
 
 ---
 
@@ -86,9 +86,9 @@ Copy next to `OPWS.exe` (e.g. `...\Game\Binaries\Win64\`):
 
 ```
 OPWS.exe
-PS4ButtonMod.dll
+GlyphSwap.dll
 Injector.exe
-PS4Mod\
+GlyphSwap\
   config.ini
   ps4_buttons.png        # your artwork (added after discovery)
   debug_magenta.png
@@ -96,9 +96,9 @@ PS4Mod\
 
 ### 3. Find the texture, then swap it
 
-1. In `PS4Mod\config.ini` keep `DumpTextures=1`. Launch the game, inject
+1. In `GlyphSwap\config.ini` keep `DumpTextures=1`. Launch the game, inject
    (`Injector.exe`), and walk to a screen showing button prompts.
-2. Open `PS4Mod\ps4mod_log.txt`. Find the `[TEX]` line for the prompt atlas
+2. Open `GlyphSwap\glyphswap_log.txt`. Find the `[TEX]` line for the prompt atlas
    (square power-of-two; `BC7`=fmt 98, `BC3`=fmt 77, RGBA8=fmt 28). Confirm
    visually with a `1024x1024 = debug_magenta.png` rule if unsure.
 3. Pin it by hash and turn dumping off:
@@ -118,7 +118,7 @@ The full discovery walkthrough is in **[INSTALL.md](INSTALL.md#5-finding-the-xbo
 
 Built and verified with **MinGW-w64 GCC 15.2 (x64, UCRT)** on Windows 10 22H2:
 
-- ✅ `PS4ButtonMod.dll` — 64-bit PE, imports `d3d11.dll`, MinHook linked statically.
+- ✅ `GlyphSwap.dll` — 64-bit PE, imports `d3d11.dll`, MinHook linked statically.
 - ✅ `Injector.exe` — 64-bit console injector.
 - ✅ Load test: DLL injected into a host process → bootstrap ran → **all four
   DX11 hooks installed OK** (dummy device falls back to WARP when no GPU).

@@ -1,4 +1,4 @@
-# Installation & Build Guide — PS4 Button Mod
+# Installation & Build Guide — GlyphSwap
 
 This guide takes you from source to a working in-game button swap. Three build
 paths are documented; pick one:
@@ -46,7 +46,7 @@ Then from the project root:
 .\build.ps1
 ```
 
-Output → `dist\PS4ButtonMod.dll` and `dist\Injector.exe`.
+Output → `dist\GlyphSwap.dll` and `dist\Injector.exe`.
 
 > **Non-ASCII path note (important on this machine).** The GNU toolchain renders
 > wide paths through the ANSI codepage, so it fails to assemble/link when either
@@ -81,7 +81,7 @@ C/C++ runtime so the artifacts are self-contained.
 
 ## 4. Build — Path C: Visual Studio (GUI)
 
-1. **File → New → Project → Dynamic-Link Library (DLL)**, name it `PS4ButtonMod`.
+1. **File → New → Project → Dynamic-Link Library (DLL)**, name it `GlyphSwap`.
    Switch the toolbar to **Release / x64**. ⚠️ x64 is mandatory.
 2. Add to the project: `src/dllmain.cpp`, `src/Crc32.h`, `src/TextureLoader.h`,
    and **all** files under `third_party/minhook/src` (including `src/hde/`).
@@ -93,7 +93,7 @@ C/C++ runtime so the artifacts are self-contained.
      (so the game doesn't need a VC++ redistributable)
    - `d3d11.lib`, `dxgi.lib`, `windowscodecs.lib` are linked automatically by the
      `#pragma comment(lib, …)` lines in the code under MSVC — no manual step.
-4. **Build** → `x64\Release\PS4ButtonMod.dll`.
+4. **Build** → `x64\Release\GlyphSwap.dll`.
 5. Add a second **Console App** project `Injector`, also **Release / x64**, add
    `injector/main.cpp`, build → `Injector.exe`.
 
@@ -116,20 +116,20 @@ Place files **next to that exe**:
 ```
 ...\Binaries\Win64\
 ├─ OPWS.exe
-├─ PS4ButtonMod.dll        ← from dist\
+├─ GlyphSwap.dll        ← from dist\
 ├─ Injector.exe            ← from dist\
-└─ PS4Mod\
+└─ GlyphSwap\
    ├─ config.ini
    ├─ debug_magenta.png    ← for discovery (included)
    ├─ ps4_buttons.png      ← your art (add after discovery)
-   └─ ps4mod_log.txt       ← created at runtime
+   └─ glyphswap_log.txt       ← created at runtime
 ```
 
 > If a small launcher `OPWS.exe` spawns a separate *Shipping* exe, inject into
 > whichever process owns the game window and the GPU usage. Pass its name to the
 > injector: `Injector.exe TheRealProcess.exe`.
 
-The mod reads `PS4Mod\` relative to the **host .exe**, and works fine even when
+The mod reads `GlyphSwap\` relative to the **host .exe**, and works fine even when
 the game lives under a Unicode path (it uses wide file APIs throughout).
 
 ---
@@ -141,7 +141,7 @@ holds the prompts. Do this once:
 
 1. Keep `DumpTextures=1` in `config.ini`. Launch, inject, and walk to a screen
    that clearly shows Xbox glyphs (tutorial popup, pause menu, interact prompt).
-2. Open `PS4Mod\ps4mod_log.txt`. Each uploaded texture logs a line:
+2. Open `GlyphSwap\glyphswap_log.txt`. Each uploaded texture logs a line:
    ```
    [TEX]  512x512  fmt=98  mips=10  hash=0x3FA90C12
    ```
@@ -187,7 +187,7 @@ consequence: your atlas must mirror the original.
   transparent (alpha) so only the glyphs are opaque.
 - If prompts span several atlases, add one `0xHASH = file.png` rule per atlas.
 
-Starter glyph sheets are included in `PS4Mod/` (transparent, optically centered):
+Starter glyph sheets are included in `GlyphSwap/` (transparent, optically centered):
 `ps4_buttons_template.png` (1024×1024 — face buttons in rings, L1/R1/L2/R2,
 L3/R3, D-pad, Touchpad, Options, Share, PS) and `ps4_buttons_filled.png`
 (solid face buttons). These are procedural *reference art* — fine as a
@@ -212,7 +212,7 @@ so the included compositor stitches them together:
 #      each glyph's x,y,w,h   = the cell that glyph must occupy
 # 3. Build the atlas:
 .\tools\build_atlas.ps1
-#    -> writes PS4Mod\ps4_buttons.png (clean bicubic scaling, transparent bg)
+#    -> writes GlyphSwap\ps4_buttons.png (clean bicubic scaling, transparent bg)
 # 4. Point config.ini at it:  0xHASH = ps4_buttons.png
 ```
 
@@ -228,30 +228,30 @@ compositor and point one `0xHASH = pack_file.png` rule at each pack PNG directly
 doesn't matter:
 
 ```powershell
-.\Injector.exe                       # defaults: OPWS.exe + .\PS4ButtonMod.dll
-.\Injector.exe OPWS.exe PS4ButtonMod.dll
+.\Injector.exe                       # defaults: OPWS.exe + .\GlyphSwap.dll
+.\Injector.exe OPWS.exe GlyphSwap.dll
 ```
 
 Optional `run.bat` next to the game exe:
 
 ```bat
 @echo off
-start "" Injector.exe OPWS.exe PS4ButtonMod.dll
+start "" Injector.exe OPWS.exe GlyphSwap.dll
 start "" steam://rungameid/PUT_APPID_HERE
 ```
 
-**Prefer Xenos?** Add `PS4ButtonMod.dll`, target `OPWS.exe`, use the standard
+**Prefer Xenos?** Add `GlyphSwap.dll`, target `OPWS.exe`, use the standard
 `LoadLibrary` method (manual mapping not required), and inject after the game
 window appears.
 
-Confirm success in `PS4Mod\ps4mod_log.txt`:
+Confirm success in `GlyphSwap\glyphswap_log.txt`:
 
 ```
-=== PS4 Button Mod starting ===
+=== GlyphSwap starting ===
 Config loaded: dump=0, hash-rules=1, dim-rules=0
 Hook installation: OK
 First Present(): D3D11 pipeline active, mod ready.
-Loaded replacement '...\PS4Mod\ps4_buttons.png'
+Loaded replacement '...\GlyphSwap\ps4_buttons.png'
 [MATCH] 512x512 hash=0x3FA90C12 -> replacement bound
 ```
 
@@ -262,7 +262,7 @@ Loaded replacement '...\PS4Mod\ps4_buttons.png'
 | Symptom | Cause / fix |
 |---|---|
 | `LoadLibrary returned 0` | Wrong arch (must be x64), or injected before D3D11 init — inject at the menu. |
-| No `ps4mod_log.txt` at all | DLL never loaded; check the injector found the right process and DLL path. |
+| No `glyphswap_log.txt` at all | DLL never loaded; check the injector found the right process and DLL path. |
 | Log exists, no `[TEX]` lines | `DumpTextures` is 0, or the atlas is created without initial pixel data (streamed) — try the magenta dimension rule instead of a hash. |
 | `[MATCH]` appears but nothing changes on screen | Glyphs may come from a different stage/material; verify with the magenta tile first. |
 | `FAILED to load '…png'` | Path/typo, or file isn't a PNG/JPG/BMP/TIFF (DDS isn't supported by WIC). |

@@ -1,7 +1,7 @@
-# build.ps1 — build PS4ButtonMod.dll + Injector.exe with MinGW-w64 (GCC),
+# build.ps1 — build GlyphSwap.dll + Injector.exe with MinGW-w64 (GCC),
 # without needing CMake. Run from the project root:  .\build.ps1
 #
-# Output goes to .\dist\ :  PS4ButtonMod.dll, Injector.exe
+# Output goes to .\dist\ :  GlyphSwap.dll, Injector.exe
 #
 # NOTE on non-ASCII paths: the GNU toolchain mishandles Unicode in both the
 # build directory AND its own install directory (it renders wide paths through
@@ -61,14 +61,14 @@ foreach ($s in $mhSrc) {
 }
 
 # --- compile + link the mod DLL --------------------------------------------
-Write-Host "  CXX dllmain.cpp -> PS4ButtonMod.dll"
+Write-Host "  CXX dllmain.cpp -> GlyphSwap.dll"
 $dllArgs = @(
     "-shared", "-O2", "-std=c++17", "-DNDEBUG",
     "-DUNICODE", "-D_UNICODE", "-DWIN32_LEAN_AND_MEAN", "-DNOMINMAX",
     "-I", "$root\src", "-I", "$mh\include",
     "$root\src\dllmain.cpp"
 ) + $mhObjs + @(
-    "-o", "$dist\PS4ButtonMod.dll",
+    "-o", "$dist\GlyphSwap.dll",
     "-static", "-static-libgcc", "-static-libstdc++",
     "-ld3d11", "-ldxgi", "-lwindowscodecs", "-lole32", "-loleaut32", "-luuid"
 )

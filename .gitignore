@@ -13,10 +13,10 @@
 *.pdb
 
 # Runtime artifacts (generated next to the game .exe, not in the repo)
-PS4Mod/ps4mod_log.txt
+GlyphSwap/glyphswap_log.txt
 
 # MinHook clone keeps its own VCS metadata
 third_party/minhook/.git/
 
 # Keep these tracked despite the *.dll / *.png patterns above
-!PS4Mod/debug_magenta.png
+!GlyphSwap/debug_magenta.png

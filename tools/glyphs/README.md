@@ -2,7 +2,7 @@
 
 Put the **individual** PNG icons from a CC0 controller-prompt pack in this
 folder, then run `..\build_atlas.ps1` to stitch them into a single
-`PS4Mod\ps4_buttons.png` atlas the mod can swap in.
+`GlyphSwap\ps4_buttons.png` atlas the mod can swap in.
 
 ## Recommended free (CC0 / public-domain) packs
 

@@ -7,18 +7,18 @@
 #
 # Usage:
 #   .\tools\build_atlas.ps1                         # uses defaults below
-#   .\tools\build_atlas.ps1 -Layout my.ini -GlyphDir art -Out PS4Mod\ps4_buttons.png
+#   .\tools\build_atlas.ps1 -Layout my.ini -GlyphDir art -Out GlyphSwap\ps4_buttons.png
 #
 # Workflow:
 #   1) Drop the pack's PNGs into  tools\glyphs\
 #   2) Run the discovery step (DumpTextures=1) to learn the original atlas's
 #      WIDTHxHEIGHT and each glyph's cell (x, y, w, h).
 #   3) Edit tools\atlas_layout.ini to match, then run this script.
-#   4) Point config.ini at the produced PS4Mod\ps4_buttons.png.
+#   4) Point config.ini at the produced GlyphSwap\ps4_buttons.png.
 param(
     [string]$Layout  = "$PSScriptRoot\atlas_layout.ini",
     [string]$GlyphDir= "$PSScriptRoot\glyphs",
-    [string]$Out      = "$PSScriptRoot\..\PS4Mod\ps4_buttons.png"
+    [string]$Out      = "$PSScriptRoot\..\GlyphSwap\ps4_buttons.png"
 )
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Drawing
